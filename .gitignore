@@ -1,0 +1,5 @@
+_resource_dump/
+run_game.bat
+*.log
+.DS_Store
+Thumbs.db
