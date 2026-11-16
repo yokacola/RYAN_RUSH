@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js';
+import { GAME_CONFIG } from './config.js?v=13';
 
 // 사용자 제작 4장 배경 레이어 연동 시스템
 // Layer 1: bg_city.png (하늘 배경)
@@ -12,19 +12,19 @@ export class Background {
 
     // 1. 하늘 배경 (bg_city.png)
     this.img1 = new Image();
-    this.img1.src = 'assets/background/bg_city.png';
+    this.img1.src = 'assets/background/bg_city.png?v=6';
 
     // 2. 먼 산 (layer_1_sky.png)
     this.img2 = new Image();
-    this.img2.src = 'assets/background/layer_1_sky.png';
+    this.img2.src = 'assets/background/layer_1_sky.png?v=6';
 
     // 3. 마을 건물 (layer_2_city.png)
     this.img3 = new Image();
-    this.img3.src = 'assets/background/layer_2_city.png';
+    this.img3.src = 'assets/background/layer_2_city.png?v=6';
 
     // 4. 아스팔트 도로 (layer_3_road.png)
     this.img4 = new Image();
-    this.img4.src = 'assets/background/layer_3_road.png';
+    this.img4.src = 'assets/background/layer_3_road.png?v=6';
 
     this.offset1 = 0;
     this.offset2 = 0;
@@ -85,7 +85,7 @@ export class Background {
     const cfg1 = this.getLayerConfig('layer1Sky', ['layer1Bg'], 0, 720, 0.10);
     const cfg2 = this.getLayerConfig('layer2Mountain', ['layer2Sky'], 110, 380, 0.35);
     const cfg3 = this.getLayerConfig('layer3City', ['layer2City'], 100, 450, 1.50);
-    const cfg4 = this.getLayerConfig('layer4Road', ['layer3Road'], 530, 190, 2.00);
+    const cfg4 = this.getLayerConfig('layer4Road', ['layer3Road'], 500, 220, 2.00);
 
     if (this.img1.complete && this.img1.width > 0) {
       const { scaledW } = this.getScaledMetrics(this.img1, cfg1);
@@ -152,7 +152,7 @@ export class Background {
     const cfg1 = this.getLayerConfig('layer1Sky', ['layer1Bg'], 0, 720, 0.10);
     const cfg2 = this.getLayerConfig('layer2Mountain', ['layer2Sky'], 110, 380, 0.35);
     const cfg3 = this.getLayerConfig('layer3City', ['layer2City'], 100, 450, 1.50);
-    const cfg4 = this.getLayerConfig('layer4Road', ['layer3Road'], 530, 190, 2.00);
+    const cfg4 = this.getLayerConfig('layer4Road', ['layer3Road'], 500, 220, 2.00);
 
     // 1. 하늘 (bg_city.png)
     this.drawLayer(ctx, this.img1, this.offset1, cfg1, w);

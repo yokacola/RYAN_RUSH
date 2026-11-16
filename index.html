@@ -1,31 +1,84 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
   <!-- 포털 사이트(구글, 네이버 등) 검색 수집 및 노출 완전 차단 -->
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <meta name="googlebot" content="noindex, nofollow">
-  
+
   <title>달려라 리안! (RYAN RUSH)</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=21">
 </head>
+
 <body>
   <div id="game-container">
     <div id="canvas-wrapper">
       <canvas id="gameCanvas"></canvas>
-      <!-- 좌상단 전체화면 버튼 -->
-      <button id="fullscreen-btn" aria-label="전체화면 전환" title="전체화면">
-        <svg id="fs-icon-enter" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-        </svg>
-        <svg id="fs-icon-exit" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-          <path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6 7 7M10 10H4m6 0V4m0 6L3 3m17 7h-6m0 0V4m0 6 7-7"></path>
-        </svg>
-      </button>
+    </div>
+
+    <!-- 아이 사진 크롭 & 이름 등록 창 (전체화면 Fullscreen) -->
+    <div id="profile-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>🚒 출동 대원 등록 🚓</h2>
+          <p>아이 사진과 이름을 등록하면 자동차에 타요!</p>
+        </div>
+
+        <div class="modal-body">
+          <!-- 왼쪽: 얼굴 크롭 & 헬멧 합성 미리보기 -->
+          <div class="crop-section">
+            <div class="crop-hint">👆 사진을 드래그하여 얼굴 위치 조절</div>
+            <div class="crop-preview-wrap" id="crop-drag-area">
+              <canvas id="face-crop-canvas" width="240" height="240"></canvas>
+            </div>
+            <div class="crop-controls">
+              <label class="file-upload-btn" for="face-file-input">
+                📷 내 휴대폰/PC 사진 고르기
+              </label>
+              <input type="file" id="face-file-input" accept="image/*" hidden>
+              <div class="zoom-row">
+                <span>크기 조절</span>
+                <input type="range" id="face-zoom-slider" min="0.5" max="3.0" step="0.02" value="1.0">
+              </div>
+              <div class="zoom-row">
+                <span>각도 조절</span>
+                <input type="range" id="face-angle-slider" min="-45" max="45" step="1" value="0">
+              </div>
+              <div class="zoom-row">
+                <span>좌우 비율</span>
+                <input type="range" id="face-aspect-slider" min="0.65" max="1.20" step="0.01" value="0.92">
+              </div>
+              <div id="face-detect-status" class="detect-status">사진을 올리면 얼굴을 자동으로 찾아줘요!</div>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 아이 이름 입력 & 차량 미리보기 안내 -->
+          <div class="info-section">
+            <label class="input-label" for="child-name-input">아이 이름</label>
+            <input type="text" id="child-name-input" maxlength="8" placeholder="예: 리안" value="리안">
+            <div class="title-preview-box">
+              <span>타이틀 미리보기</span>
+              <strong id="title-preview-text">달려라 리안!!</strong>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" id="profile-save-btn" class="btn-primary">완료! 자동차 타러 가기</button>
+              <button type="button" id="profile-default-btn" class="btn-secondary">기본 사진으로 바로 시작</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <script type="module" src="src/main.js"></script>
+  <script type="module" src="src/main.js?v=24"></script>
 </body>
+
 </html>

@@ -1,4 +1,4 @@
-import { Game } from './game.js';
+import { Game } from './game.js?v=24';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('gameCanvas');
@@ -31,13 +31,16 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('resize', resizeCanvas);
+  document.addEventListener('fullscreenchange', resizeCanvas);
+  document.addEventListener('webkitfullscreenchange', resizeCanvas);
   resizeCanvas();
 
   // 화면 좌표 -> 게임 가상 좌표(1280 x 720) 변환
   function getCanvasCoords(e) {
     const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+    const clientX = touch ? touch.clientX : e.clientX;
+    const clientY = touch ? touch.clientY : e.clientY;
 
     const scaleX = 1280 / rect.width;
     const scaleY = 720 / rect.height;
@@ -48,19 +51,24 @@ window.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // 마우스 클릭 / 터치 입력
+  let lastTouchTime = 0;
+
+  // 마우스 클릭 입력 (터치 직후 발생하는 중복 mousedown 방지)
   canvas.addEventListener('mousedown', (e) => {
+    if (performance.now() - lastTouchTime < 500) return;
     const coords = getCanvasCoords(e);
     game.handleInput(coords.x, coords.y);
   });
 
+  // 모바일 / 태블릿 터치 입력
   canvas.addEventListener('touchstart', (e) => {
+    lastTouchTime = performance.now();
     e.preventDefault();
     const coords = getCanvasCoords(e);
     game.handleInput(coords.x, coords.y);
   }, { passive: false });
 
-  // 키보드 조작 (PC 스페이스바 / 방향키 위)
+  // 키보드 조작 (PC 스페이스바 / 방향키 위 / 엔터)
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'Enter') {
       e.preventDefault();
@@ -68,55 +76,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 좌상단 전체화면 버튼 토글 로직
-  const fsBtn = document.getElementById('fullscreen-btn');
-  const iconEnter = document.getElementById('fs-icon-enter');
-  const iconExit = document.getElementById('fs-icon-exit');
-
-  function updateFsIcon() {
-    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    if (iconEnter && iconExit) {
-      iconEnter.style.display = isFs ? 'none' : 'block';
-      iconExit.style.display = isFs ? 'block' : 'none';
-    }
-    resizeCanvas();
-  }
-
-  function toggleFullscreen() {
-    const elem = document.documentElement;
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen().catch(() => {});
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      }
-    }
-  }
-
-  if (fsBtn) {
-    fsBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      toggleFullscreen();
-    });
-    fsBtn.addEventListener('touchstart', (e) => {
-      e.stopPropagation();
-    }, { passive: false });
-    fsBtn.addEventListener('pointerdown', (e) => {
-      e.stopPropagation();
-    });
-  }
-
-  document.addEventListener('fullscreenchange', updateFsIcon);
-  document.addEventListener('webkitfullscreenchange', updateFsIcon);
-
-  // 게임 시작
   // 타이틀 화면부터 즉시 BGM 재생 시도 및 브라우저 첫 터치/키 즉시 언락
   game.audio.playBGM();
 

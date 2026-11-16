@@ -13,7 +13,8 @@ html, body {
   height: 100%;
   overflow: hidden;
   background-color: #1a1e29;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'IBM Plex Sans KR', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  font-weight: 500;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -46,34 +47,268 @@ canvas#gameCanvas {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* 좌상단 작고 귀여운 젤리 전체화면 버튼 */
-#fullscreen-btn {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(30, 40, 60, 0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.75);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  cursor: pointer;
+/* =========================================================================
+   출동 대원 등록 창 (전체화면 Fullscreen 레이아웃)
+   ========================================================================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(180deg, #182232 0%, #0f172a 100%);
   display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  padding: 0;
+}
+
+.modal-overlay.hidden {
+  display: none !important;
+}
+
+.modal-card {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  overflow-y: auto;
+  padding: clamp(20px, 4vh, 48px) clamp(24px, 6vw, 80px);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(18px, 3.5vh, 36px);
+}
+
+.modal-header {
+  text-align: center;
+}
+
+.modal-header h2 {
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 700;
+  color: #fff9c4;
+  margin-bottom: 6px;
+}
+
+.modal-header p {
+  font-size: clamp(15px, 2vw, 19px);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.80);
+}
+
+.modal-body {
+  display: flex;
+  gap: clamp(28px, 5vw, 64px);
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  transition: transform 0.15s ease, background 0.15s ease;
+  flex-wrap: wrap;
+  width: min(860px, 100%);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  border-radius: 28px;
+  padding: clamp(22px, 3.5vh, 40px) clamp(24px, 4vw, 48px);
+}
+
+.crop-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  flex: 1 1 280px;
+}
+
+.crop-preview-wrap {
+  position: relative;
+  width: clamp(190px, 28vh, 240px);
+  height: clamp(190px, 28vh, 240px);
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  background: #263238;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.crop-preview-wrap:active {
+  cursor: grabbing;
+}
+
+#face-crop-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.crop-hint {
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff9c4;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 249, 196, 0.35);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.crop-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.file-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff9c4;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 11px 24px;
+  border-radius: 999px;
+  border: 1.8px solid rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.file-upload-btn:hover {
+  transform: scale(1.02);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.file-upload-btn:active {
+  transform: scale(0.97);
+}
+
+.zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 88%;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.zoom-row input[type="range"] {
+  flex: 1;
+  accent-color: #ffd54f;
+  cursor: pointer;
+}
+
+.detect-status {
+  font-size: 13px;
+  font-weight: 500;
+  color: #80cbc4;
+  text-align: center;
+  min-height: 20px;
+}
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1 1 280px;
+}
+
+.input-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff9c4;
+}
+
+#child-name-input {
+  width: 100%;
+  font-family: 'IBM Plex Sans KR', 'Pretendard', 'Malgun Gothic', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  background: rgba(15, 23, 42, 0.65);
+  color: #ffffff;
   outline: none;
-  touch-action: manipulation;
+  text-align: center;
+  user-select: text;
+  -webkit-user-select: text;
 }
 
-#fullscreen-btn:hover {
-  transform: scale(1.08);
-  background: rgba(30, 40, 60, 0.65);
+#child-name-input:focus {
+  border-color: #ffd54f;
+  box-shadow: 0 0 0 3px rgba(255, 213, 79, 0.25);
 }
 
-#fullscreen-btn:active {
-  transform: scale(0.92);
+.title-preview-box {
+  background: rgba(15, 23, 42, 0.55);
+  border: 1.5px dashed rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title-preview-box strong {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffd54f;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btn-primary {
+  font-family: 'IBM Plex Sans KR', 'Pretendard', 'Malgun Gothic', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 13px 22px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  background: linear-gradient(180deg, #ef5350 0%, #c62828 100%);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(198, 40, 40, 0.4);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.02);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-secondary {
+  font-family: 'IBM Plex Sans KR', 'Pretendard', 'Malgun Gothic', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.88);
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.18);
 }

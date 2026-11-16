@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js';
+import { GAME_CONFIG } from './config.js?v=6';
 
 // 사물 (아이템 및 장애물) 스폰 및 충돌 판정 매니저
 export class Spawner {
@@ -11,14 +11,14 @@ export class Spawner {
     this.itemImages = [];
     for (let i = 0; i < 3; i++) {
       const img = new Image();
-      img.src = `assets/items/item_${i}.png`;
+      img.src = `assets/items/item_${i}.png?v=6`;
       this.itemImages.push(img);
     }
 
     this.obsImages = [];
     for (let i = 0; i < 3; i++) {
       const img = new Image();
-      img.src = `assets/obstacles/obs_${i}.png`;
+      img.src = `assets/obstacles/obs_${i}.png?v=6`;
       this.obsImages.push(img);
     }
   }

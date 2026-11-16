@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>달려라 리안! - 인게임 에셋 좌표 & 스케일 튜너</title>
+  <style>
+    :root {
+      --bg-dark: #121318;
+      --bg-panel: #1a1c24;
+      --bg-card: #232634;
+      --bg-input: #15161f;
+      --accent: #ff4757;
+      --accent-hover: #ff6b81;
+      --blue: #2ed573;
+      --blue-accent: #1e90ff;
+      --text: #f1f2f6;
+      --text-dim: #a4b0be;
+      --border: #2f3542;
+      --border-focus: #5352ed;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Pretendard", sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* 상단 네비게이션 헤더 */
+    header {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.3px;
+    }
+    .brand-badge {
+      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .vehicle-tabs {
+      display: flex;
+      background: var(--bg-input);
+      border-radius: 8px;
+      padding: 3px;
+      border: 1px solid var(--border);
+      gap: 4px;
+    }
+    .v-tab {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-dim);
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+    }
+    .v-tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+    }
+    .v-tab[data-type="ambulance"].active {
+      background: #00b894;
+      box-shadow: 0 2px 8px rgba(0, 184, 148, 0.4);
+    }
+    .v-tab[data-type="police"].active {
+      background: #1e90ff;
+      box-shadow: 0 2px 8px rgba(30, 144, 255, 0.4);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn {
+      padding: 6px 13px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn:hover {
+      background: #2f3542;
+      border-color: #57606f;
+    }
+    .btn-primary {
+      background: var(--blue-accent);
+      color: #fff;
+      border-color: transparent;
+    }
+    .btn-primary:hover {
+      background: #3742fa;
+    }
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+    .btn-accent:hover {
+      background: var(--accent-hover);
+    }
+
+    /* 메인 3컬럼 레이아웃 */
+    .main-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 좌측 레이어 패널 */
+    .left-sidebar {
+      width: 250px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .panel-title {
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .layer-list {
+      list-style: none;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .layer-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .layer-item:hover {
+      background: #2b2f42;
+      border-color: #3e445e;
+    }
+    .layer-item.active {
+      border-color: var(--blue-accent);
+      background: rgba(30, 144, 255, 0.15);
+      color: #fff;
+    }
+    .layer-order {
+      font-size: 10px;
+      color: var(--text-dim);
+      font-weight: 700;
+      background: var(--bg-input);
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .layer-name { flex: 1; font-weight: 600; }
+    .layer-toggle {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 2px 4px;
+    }
+    .layer-toggle.hidden { opacity: 0.3; }
+
+    /* 중앙 캔버스 뷰포트 */
+    .viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0e0f14;
+      position: relative;
+      overflow: hidden;
+    }
+    .canvas-toolbar {
+      height: 42px;
+      background: rgba(26, 28, 36, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 5;
+    }
+    .tool-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .tool-label { color: var(--text-dim); font-size: 11px; margin-right: 4px; }
+
+    .canvas-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: crosshair;
+    }
+    #mainCanvas {
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      border-radius: 6px;
+      image-rendering: auto;
+    }
+
+    /* 체커보드 배경 */
+    .bg-checker {
+      background-color: #1e1e24;
+      background-image: 
+        linear-gradient(45deg, #282830 25%, transparent 25%),
+        linear-gradient(-45deg, #282830 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #282830 75%),
+        linear-gradient(-45deg, transparent 75%, #282830 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+    .bg-road {
+      background: #111;
+    }
+
+    /* 우측 하단 미니 프리뷰 (실제 인게임 크기) */
+    .mini-preview {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      width: 200px;
+      height: 150px;
+      background: rgba(20, 22, 30, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      z-index: 6;
+    }
+    .mini-preview-header {
+      padding: 4px 8px;
+      background: var(--bg-panel);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .mini-preview canvas {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 22px);
+    }
+
+    /* 우측 인스펙터 패널 */
+    .right-sidebar {
+      width: 360px;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .inspector-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .prop-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .prop-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .badge-sub {
+      font-size: 10px;
+      background: var(--bg-input);
+      color: var(--text-dim);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .control-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      min-width: 80px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .control-inputs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .slider {
+      flex: 1;
+      accent-color: var(--blue-accent);
+      cursor: pointer;
+    }
+    .num-input {
+      width: 68px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: monospace;
+      text-align: right;
+    }
+    .num-input:focus {
+      outline: none;
+      border-color: var(--blue-accent);
+    }
+
+    /* 헬멧 10종 썸네일 그리드 */
+    .helmet-gallery {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      background: var(--bg-input);
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .helmet-thumb {
+      aspect-ratio: 1;
+      background: #252836;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      position: relative;
+      transition: all 0.15s;
+    }
+    .helmet-thumb:hover {
+      border-color: #57606f;
+      background: #2f3448;
+    }
+    .helmet-thumb.active {
+      border-color: var(--accent);
+      background: rgba(255, 71, 87, 0.15);
+    }
+    .helmet-thumb img {
+      max-width: 100%;
+      max-height: 80%;
+      object-fit: contain;
+    }
+    .helmet-thumb-label {
+      font-size: 9px;
+      color: var(--text-dim);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* 코드 복사 영역 */
+    .code-box {
+      background: #0d0e12;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: Consolas, monospace;
+      font-size: 11px;
+      color: #4ed1a3;
+      white-space: pre;
+      overflow-x: auto;
+      max-height: 160px;
+    }
+
+    /* 토스트 알림 */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #2ed573;
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      z-index: 100;
+    }
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header>
+    <div class="brand">
+      <span>🚒 달려라 리안!</span>
+      <span class="brand-badge">ASSET TUNER v2.0</span>
+    </div>
+
+    <!-- 직종 탭 -->
+    <div class="vehicle-tabs">
+      <button class="v-tab active" data-type="fire" onclick="switchVehicle('fire')">🚒 소방차 (Fire)</button>
+      <button class="v-tab" data-type="ambulance" onclick="switchVehicle('ambulance')">🚑 구급차 (Ambulance)</button>
+      <button class="v-tab" data-type="police" onclick="switchVehicle('police')">🚓 경찰차 (Police)</button>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="copyConfigCode()">📋 config.js 코드 복사</button>
+      <button class="btn btn-accent" onclick="exportHelmet960()">💾 헬멧 에셋 내보내기 (960x664)</button>
+      <button class="btn" onclick="exportCompositePNG()">🖼️ 조립본 PNG 저장</button>
+    </div>
+  </header>
+
+  <div class="main-body">
+
+    <!-- 좌측 레이어 목록 -->
+    <div class="left-sidebar">
+      <div class="panel-title">
+        <span>🎨 레이어 순서 (Z-Index)</span>
+        <span style="font-size: 10px; color: var(--text-dim);">위쪽이 상위</span>
+      </div>
+      <ul class="layer-list" id="layerList">
+        <!-- JS로 동적 생성 -->
+      </ul>
+
+      <!-- 다른 차량 설정 복사 -->
+      <div class="panel-title" style="margin-top: auto; border-top: 1px solid var(--border);">
+        <span>📥 다른 차량 설정 복사</span>
+      </div>
+      <div style="padding: 10px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border);">
+        <div style="display: flex; gap: 6px;">
+          <select id="selCopySource" class="num-input" style="flex: 1; text-align: left; height: 28px; padding: 2px 6px;">
+            <option value="fire">🚒 소방차 설정</option>
+            <option value="ambulance">🚑 구급차 설정</option>
+            <option value="police">🚓 경찰차 설정</option>
+          </select>
+          <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11px;" onclick="copySettingsFromVehicle()">가져오기</button>
+        </div>
+        <div style="font-size: 11px; color: var(--text-dim); display: flex; flex-direction: column; gap: 4px;">
+          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <input type="checkbox" id="chkCopyFace" checked> 👶 얼굴 슬롯 좌표 (Face)
+          </label>
+          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <input type="checkbox" id="chkCopyArm" checked> 👋 양팔 피벗 좌표 (Arm)
+          </label>
+          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <input type="checkbox" id="chkCopyHelmet" checked> ⛑️ 헬멧 위치/크기 (Helmet)
+          </label>
+        </div>
+        <button class="btn" style="width: 100%; justify-content: center; font-size: 11px; background: rgba(255, 71, 87, 0.15); border-color: var(--accent); color: #fff;" onclick="quickCopyFromFire()">
+          ⚡ 소방차 설정 원클릭 복사
+        </button>
+      </div>
+
+      <div class="panel-title">
+        <span>⚙️ 빠른 프리셋</span>
+      </div>
+      <div style="padding: 10px; display: flex; flex-direction: column; gap: 6px;">
+        <button class="btn" style="width: 100%; justify-content: center;" onclick="resetCurrentVehicle()">🔄 현재 직종 기본값 복원</button>
+        <button class="btn" style="width: 100%; justify-content: center;" onclick="downloadPresetJSON()">💾 설정 JSON 다운로드</button>
+        <label class="btn" style="width: 100%; justify-content: center; cursor: pointer;">
+          📂 설정 JSON 불러오기
+          <input type="file" accept=".json" style="display:none;" onchange="loadPresetJSON(event)">
+        </label>
+      </div>
+    </div>
+
+    <!-- 중앙 캔버스 뷰포트 -->
+    <div class="viewport">
+      <div class="canvas-toolbar">
+        <div class="tool-group">
+          <span class="tool-label">배경:</span>
+          <button class="btn" id="btnBgCheck" onclick="setBg('checker')">🏁 격자</button>
+          <button class="btn" id="btnBgRoad" onclick="setBg('road')">🛣️ 도로</button>
+          <button class="btn" id="btnBgDark" onclick="setBg('dark')">⬛ 다크</button>
+        </div>
+
+        <div class="tool-group">
+          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--text-dim);">
+            <input type="checkbox" id="chkGuides" checked onchange="redraw()"> 📐 보조선 & 피벗 표시
+          </label>
+          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--text-dim); margin-left: 8px;">
+            <input type="checkbox" id="chkWaveAnim" onchange="toggleAnim(this.checked)"> 👋 손 흔들기 애니메이션
+          </label>
+        </div>
+
+        <div class="tool-group">
+          <span class="tool-label">줌:</span>
+          <button class="btn" onclick="setZoom(0.8)">80%</button>
+          <button class="btn" onclick="setZoom(1.0)">100%</button>
+          <button class="btn" onclick="setZoom(1.2)">120%</button>
+          <span id="zoomText" style="color: #fff; font-family: monospace; font-size: 11px;">100%</span>
+        </div>
+      </div>
+
+      <div class="canvas-container bg-checker" id="canvasContainer">
+        <!-- 960x664 원본 규격 메인 캔버스 -->
+        <canvas id="mainCanvas" width="960" height="664"></canvas>
+
+        <!-- 우측 하단 실제 인게임 크기 프리뷰 (300x208) -->
+        <div class="mini-preview">
+          <div class="mini-preview-header">
+            <span>인게임 실제 크기 (300x208)</span>
+            <span id="miniRatio">1x</span>
+          </div>
+          <canvas id="miniCanvas" width="300" height="208"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 우측 속성 인스펙터 패널 -->
+    <div class="right-sidebar">
+      <div class="panel-title">
+        <span id="inspectorTitle">🛠️ 레이어 속성 편집</span>
+        <span id="currentCoordInfo" style="font-family: monospace; font-size: 10px; color: var(--blue-accent);"></span>
+      </div>
+
+      <div class="inspector-content">
+
+        <!-- 헬멧 선택 갤러리 카드 (선택된 직종이 소방관일 때 10종 노출) -->
+        <div class="prop-card" id="helmetGalleryCard">
+          <div class="prop-card-title">
+            <span>⛑️ 헬멧 / 모자 선택</span>
+            <span class="badge-sub" id="helmetStatusBadge">후보 #1 선택됨</span>
+          </div>
+          
+          <div class="helmet-gallery" id="helmetGallery">
+            <!-- 소방관 10종 썸네일 동적 삽입 -->
+          </div>
+
+          <div style="display: flex; gap: 6px; margin-top: 4px;">
+            <button class="btn" style="flex: 1; justify-content: center; font-size: 11px;" onclick="selectOriginalGameHelmet()">
+              기존 게임 에셋 사용
+            </button>
+            <label class="btn" style="flex: 1; justify-content: center; font-size: 11px; cursor: pointer;">
+              📁 커스텀 이미지
+              <input type="file" accept="image/*" style="display:none;" onchange="uploadCustomHelmet(event)">
+            </label>
+          </div>
+        </div>
+
+        <!-- 파츠 속성 제어 카드 (선택된 레이어에 따라 동적 UI) -->
+        <div class="prop-card" id="propCard">
+          <div class="prop-card-title">
+            <span id="propCardHeader">위치 및 스케일</span>
+            <button class="btn" style="padding: 2px 8px; font-size: 10px;" onclick="resetCurrentLayer()">레이어 리셋</button>
+          </div>
+
+          <div id="dynamicControls">
+            <!-- 동적 컨트롤러 슬라이더들 삽입 -->
+          </div>
+        </div>
+
+        <!-- 실시간 config.js 코드 프리뷰 -->
+        <div class="prop-card">
+          <div class="prop-card-title">
+            <span>📝 실시간 GAME_CONFIG 코드</span>
+            <button class="btn btn-primary" style="padding: 2px 8px; font-size: 11px;" onclick="copyConfigCode()">복사</button>
+          </div>
+          <div class="code-box" id="codeBox">// 코드 생성 중...</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast">알림 메시지</div>
+
+  <script>
+    // =========================================================================
+    //  전역 상태 및 데이터 구조
+    // =========================================================================
+    const CANVAS_W = 960;
+    const CANVAS_H = 664;
+
+    let currentVehicle = 'fire'; // 'fire', 'ambulance', 'police'
+    let selectedLayerId = 'helmet'; // 'helmet', 'face', 'body', 'arm', 'vehicle'
+    let zoomLevel = 1.0;
+    let animRunning = false;
+    let animTime = 0;
+    let animRafId = null;
+
+    // 각 직종별 기본 튜닝 데이터 (960x664 픽셀 기준)
+    const defaultData = {
+      fire: {
+        vehicle: { x: 0, y: 0, scale: 1 },
+        body: { x: 4, y: -40, scale: 0.7 },
+        arm: { pivotX: 453, pivotY: 241, scale: 0.5, baseAngle: -0.22, waveAmp: 0.1 },
+        face: { cx: 455, cy: 175, rx: 91.5, ry: 100.8, scale: 3.5, offsetX: 5, offsetY: -28 },
+        helmet: { cx: 454, cy: 81, width: 236, height: 153, rotation: 0, type: 'cand_1', isCustom: false }
+      },
+      ambulance: {
+        vehicle: { x: 0, y: 0, scale: 1 },
+        body: { x: 4, y: -41, scale: 0.7 },
+        arm: { pivotX: 453, pivotY: 241, scale: 0.5, baseAngle: -0.22, waveAmp: 0.1 },
+        face: { cx: 455, cy: 175, rx: 91.5, ry: 100.8, scale: 3.5, offsetX: 5, offsetY: -28 },
+        helmet: { cx: 453, cy: 90, width: 211, height: 104, rotation: 0, type: "restored", isCustom: false }
+      },
+      police: {
+        vehicle: { x: 0, y: 0, scale: 1 },
+        body: { x: 5, y: -35, scale: 0.75 },
+        arm: { pivotX: 453, pivotY: 241, scale: 0.5, baseAngle: -0.22, waveAmp: 0.1 },
+        face: { cx: 455, cy: 175, rx: 91.5, ry: 100.8, scale: 3.5, offsetX: 5, offsetY: -28 },
+        helmet: { cx: 455, cy: 90, width: 211, height: 104, rotation: 0, type: "restored", isCustom: false }
+      }
+    };
+
+    // 실시간 작업 데이터 (deep copy)
+    let tuneData = JSON.parse(JSON.stringify(defaultData));
+
+    // 레이어 표시 여부 (Visibility)
+    const layerVisibility = {
+      helmet: true,
+      face: true,
+      body: true,
+      arm: true,
+      vehicle: true
+    };
+
+    // 레이어 표시 메타데이터
+    const layerDefs = [
+      { id: 'helmet',  name: '⛑️ 헬멧 / 모자',     order: 5 },
+      { id: 'face',    name: '👶 얼굴 슬롯 (Face)', order: 4 },
+      { id: 'body',    name: '👔 출동대원 몸통 (Body)', order: 3 },
+      { id: 'arm',     name: '👋 흔드는 양팔 (Arms)', order: 2 },
+      { id: 'vehicle', name: '🚗 자동차 본체 (Car)',  order: 1 },
+    ];
+
+    // =========================================================================
+    //  이미지 에셋 로더
+    // =========================================================================
+    const images = {
+      fire: {},
+      ambulance: {},
+      police: {},
+      helmets: {
+        fire_cand: [],
+        police_restored: new Image(),
+        ambulance_restored: new Image()
+      },
+      face: new Image(),
+      roadBg: new Image()
+    };
+
+    // 공통 이미지 로드
+    images.face.src = '../assets/player/default_face.png';
+    images.face.onload = () => redraw();
+
+    images.roadBg.src = '../assets/background/layer_3_road.png';
+    images.roadBg.onload = () => redraw();
+
+    images.helmets.police_restored.src = '../assets/player/candidates/police_hat_restored.png';
+    images.helmets.police_restored.onload = () => redraw();
+
+    images.helmets.ambulance_restored.src = '../assets/player/candidates/ambulance_hat_restored.png';
+    images.helmets.ambulance_restored.onload = () => redraw();
+
+    // 소방관 헬멧 후보 10종 로드
+    for (let i = 1; i <= 10; i++) {
+      const img = new Image();
+      img.src = `../assets/player/candidates/fire_helmet_cand_${i}.png`;
+      img.onload = () => redraw();
+      images.helmets.fire_cand[i] = img;
+    }
+
+    // 차량별 3종 기본 에셋 로드
+    ['fire', 'ambulance', 'police'].forEach(t => {
+      images[t].vehicle = new Image();
+      images[t].vehicle.src = `../assets/player/vehicle_${t}.png`;
+      images[t].vehicle.onload = () => redraw();
+
+      images[t].body = new Image();
+      images[t].body.src = `../assets/player/body_${t}.png`;
+      images[t].body.onload = () => redraw();
+
+      images[t].arm = new Image();
+      images[t].arm.src = `../assets/player/arm_${t}.png`;
+      images[t].arm.onload = () => redraw();
+
+      images[t].helmetOriginal = new Image();
+      images[t].helmetOriginal.src = `../assets/player/helmet_${t}.png`;
+      images[t].helmetOriginal.onload = () => redraw();
+    });
+
+    // 커스텀 업로드 헬멧 저장소
+    let customHelmetImg = null;
+
+    // =========================================================================
+    //  초기화 및 UI 구축
+    // =========================================================================
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const miniCanvas = document.getElementById('miniCanvas');
+    const miniCtx = miniCanvas.getContext('2d');
+
+    window.addEventListener('DOMContentLoaded', () => {
+      buildLayerList();
+      buildHelmetGallery();
+      selectLayer('helmet');
+      setZoom(1.0);
+      redraw();
+      updateCodeBox();
+      setupCanvasInteractions();
+    });
+
+    // 직종 변경
+    function switchVehicle(type) {
+      currentVehicle = type;
+      document.querySelectorAll('.v-tab').forEach(b => {
+        b.classList.toggle('active', b.dataset.type === type);
+      });
+      buildHelmetGallery();
+      selectLayer(selectedLayerId);
+      redraw();
+      updateCodeBox();
+      showToast(`직종 변경: ${type.toUpperCase()}`);
+    }
+
+    // 레이어 목록 UI 생성
+    function buildLayerList() {
+      const list = document.getElementById('layerList');
+      list.innerHTML = '';
+      layerDefs.forEach(layer => {
+        const li = document.createElement('li');
+        li.className = `layer-item ${selectedLayerId === layer.id ? 'active' : ''}`;
+        li.onclick = (e) => {
+          if (e.target.classList.contains('layer-toggle')) return;
+          selectLayer(layer.id);
+        };
+
+        li.innerHTML = `
+          <span class="layer-order">${layer.order}</span>
+          <span class="layer-name">${layer.name}</span>
+          <button class="layer-toggle ${layerVisibility[layer.id] ? '' : 'hidden'}" onclick="toggleLayerVis('${layer.id}', this)">
+            ${layerVisibility[layer.id] ? '👁️' : '🕶️'}
+          </button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function toggleLayerVis(layerId, btn) {
+      layerVisibility[layerId] = !layerVisibility[layerId];
+      btn.innerHTML = layerVisibility[layerId] ? '👁️' : '🕶️';
+      btn.classList.toggle('hidden', !layerVisibility[layerId]);
+      redraw();
+    }
+
+    // 레이어 선택
+    function selectLayer(id) {
+      selectedLayerId = id;
+      document.querySelectorAll('.layer-item').forEach((item, idx) => {
+        item.classList.toggle('active', layerDefs[idx].id === id);
+      });
+      buildInspectorControls(id);
+      redraw();
+    }
+
+    // 헬멧 갤러리 구축 (소방관일 때 10종, 경찰차일 때 복원모자 등)
+    function buildHelmetGallery() {
+      const container = document.getElementById('helmetGallery');
+      const badge = document.getElementById('helmetStatusBadge');
+      container.innerHTML = '';
+
+      if (currentVehicle === 'fire') {
+        badge.innerText = `소방 헬멧 10종 후보`;
+        for (let i = 1; i <= 10; i++) {
+          const div = document.createElement('div');
+          const isAct = tuneData.fire.helmet.type === `cand_${i}`;
+          div.className = `helmet-thumb ${isAct ? 'active' : ''}`;
+          div.onclick = () => selectHelmetCandidate(i);
+
+          div.innerHTML = `
+            <img src="../assets/player/candidates/fire_helmet_cand_${i}.png" alt="헬멧 ${i}">
+            <span class="helmet-thumb-label">#${i}</span>
+          `;
+          container.appendChild(div);
+        }
+      } else if (currentVehicle === 'police') {
+        badge.innerText = `경찰 모자 옵션`;
+        const div1 = document.createElement('div');
+        div1.className = `helmet-thumb ${tuneData.police.helmet.type === 'original' ? 'active' : ''}`;
+        div1.onclick = () => selectOriginalGameHelmet();
+        div1.innerHTML = `<img src="../assets/player/helmet_police.png"><span class="helmet-thumb-label">기존 원본</span>`;
+        container.appendChild(div1);
+
+        const div2 = document.createElement('div');
+        div2.className = `helmet-thumb ${tuneData.police.helmet.type === 'restored' ? 'active' : ''}`;
+        div2.onclick = () => selectRestoredPoliceHat();
+        div2.innerHTML = `<img src="../assets/player/candidates/police_hat_restored.png"><span class="helmet-thumb-label">✨ 복원 모자</span>`;
+        container.appendChild(div2);
+      } else {
+        badge.innerText = `구급대원 모자 옵션`;
+        const div1 = document.createElement('div');
+        div1.className = `helmet-thumb ${tuneData.ambulance.helmet.type === 'original' ? 'active' : ''}`;
+        div1.onclick = () => selectOriginalGameHelmet();
+        div1.innerHTML = `<img src="../assets/player/helmet_ambulance.png"><span class="helmet-thumb-label">기존 원본</span>`;
+        container.appendChild(div1);
+
+        const div2 = document.createElement('div');
+        div2.className = `helmet-thumb ${tuneData.ambulance.helmet.type === 'restored' ? 'active' : ''}`;
+        div2.onclick = () => selectRestoredAmbulanceHat();
+        div2.innerHTML = `<img src="../assets/player/candidates/ambulance_hat_restored.png"><span class="helmet-thumb-label">✨ 복원 모자</span>`;
+        container.appendChild(div2);
+      }
+    }
+
+    function selectHelmetCandidate(idx) {
+      const h = tuneData.fire.helmet;
+      h.type = `cand_${idx}`;
+      h.isCustom = false;
+      // 기본 크롭 이미지 비율에 맞추어 스케일 초기화 (가로 약 236px)
+      h.width = 236;
+      h.height = Math.round(236 * (260 / 400));
+      h.cx = 440;
+      h.cy = 115;
+      buildHelmetGallery();
+      buildInspectorControls('helmet');
+      redraw();
+      updateCodeBox();
+      showToast(`소방 헬멧 #${idx} 적용 완료!`);
+    }
+
+    function selectRestoredPoliceHat() {
+      const h = tuneData.police.helmet;
+      h.type = 'restored';
+      h.isCustom = false;
+      h.width = 240;
+      h.height = 145;
+      h.cx = 440;
+      h.cy = 112;
+      buildHelmetGallery();
+      buildInspectorControls('helmet');
+      redraw();
+      updateCodeBox();
+      showToast(`복원된 경찰모 적용 완료!`);
+    }
+
+    function selectRestoredAmbulanceHat() {
+      const h = tuneData.ambulance.helmet;
+      h.type = 'restored';
+      h.isCustom = false;
+      h.width = 240;
+      h.height = 145;
+      h.cx = 440;
+      h.cy = 112;
+      buildHelmetGallery();
+      buildInspectorControls('helmet');
+      redraw();
+      updateCodeBox();
+      showToast(`복원된 구급대원 모자 적용 완료!`);
+    }
+
+    function selectOriginalGameHelmet() {
+      const h = tuneData[currentVehicle].helmet;
+      h.type = 'original';
+      h.isCustom = false;
+      h.width = 236;
+      h.height = 144;
+      h.cx = 440;
+      h.cy = 112;
+      buildHelmetGallery();
+      buildInspectorControls('helmet');
+      redraw();
+      updateCodeBox();
+      showToast(`기존 게임 원본 헬멧으로 복원!`);
+    }
+
+    function uploadCustomHelmet(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          customHelmetImg = img;
+          const h = tuneData[currentVehicle].helmet;
+          h.type = 'custom';
+          h.isCustom = true;
+          h.width = 236;
+          h.height = Math.round(236 * (img.height / img.width));
+          h.cx = 440;
+          h.cy = 115;
+          buildInspectorControls('helmet');
+          redraw();
+          updateCodeBox();
+          showToast(`커스텀 헬멧 불러오기 완료! (${img.width}x${img.height})`);
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // =========================================================================
+    //  인스펙터 상세 컨트롤러 UI 구축
+    // =========================================================================
+    function buildInspectorControls(layerId) {
+      const container = document.getElementById('dynamicControls');
+      const title = document.getElementById('inspectorTitle');
+      const header = document.getElementById('propCardHeader');
+      const data = tuneData[currentVehicle][layerId];
+
+      const layerName = layerDefs.find(l => l.id === layerId)?.name || layerId;
+      title.innerText = `🛠️ ${layerName} 편집`;
+      header.innerText = `${layerName} 상세 속성`;
+
+      container.innerHTML = '';
+
+      if (layerId === 'helmet') {
+        addSlider(container, '중심 X (cx)', data.cx, 200, 700, 1, v => { data.cx = v; redraw(); updateCodeBox(); });
+        addSlider(container, '중심 Y (cy)', data.cy, 20, 300, 1, v => { data.cy = v; redraw(); updateCodeBox(); });
+        addSlider(container, '가로 폭 (Width)', data.width, 100, 450, 1, v => { 
+          const ratio = data.height / data.width;
+          data.width = v;
+          data.height = Math.round(v * ratio);
+          buildInspectorControls('helmet');
+          redraw(); 
+          updateCodeBox(); 
+        });
+        addSlider(container, '세로 높이 (Height)', data.height, 50, 350, 1, v => { data.height = v; redraw(); updateCodeBox(); });
+        addSlider(container, '회전각 (도)', data.rotation, -90, 90, 0.5, v => { data.rotation = v; redraw(); updateCodeBox(); });
+      } else if (layerId === 'face') {
+        addSlider(container, '중심 X (cx)', data.cx, 300, 600, 0.5, v => { data.cx = v; redraw(); updateCodeBox(); });
+        addSlider(container, '중심 Y (cy)', data.cy, 100, 400, 0.5, v => { data.cy = v; redraw(); updateCodeBox(); });
+        addSlider(container, '가로 반경 (rx)', data.rx, 40, 180, 0.5, v => { data.rx = v; redraw(); updateCodeBox(); });
+        addSlider(container, '세로 반경 (ry)', data.ry, 40, 180, 0.5, v => { data.ry = v; redraw(); updateCodeBox(); });
+        addSlider(container, '얼굴 확대율', data.scale, 1.0, 3.5, 0.02, v => { data.scale = v; redraw(); updateCodeBox(); });
+        addSlider(container, '사진 오프셋 X', data.offsetX, -50, 50, 1, v => { data.offsetX = v; redraw(); updateCodeBox(); });
+        addSlider(container, '사진 오프셋 Y', data.offsetY, -50, 50, 1, v => { data.offsetY = v; redraw(); updateCodeBox(); });
+      } else if (layerId === 'arm') {
+        addSlider(container, '피벗 X (px)', data.pivotX, 200, 500, 1, v => { data.pivotX = v; redraw(); updateCodeBox(); });
+        addSlider(container, '피벗 Y (py)', data.pivotY, 150, 450, 1, v => { data.pivotY = v; redraw(); updateCodeBox(); });
+        addSlider(container, '팔 스케일', data.scale, 0.5, 1.8, 0.01, v => { data.scale = v; redraw(); updateCodeBox(); });
+        addSlider(container, '기본 회전각', data.baseAngle, -1.0, 1.0, 0.02, v => { data.baseAngle = v; redraw(); updateCodeBox(); });
+        addSlider(container, '흔들기 진폭', data.waveAmp, 0.0, 0.6, 0.01, v => { data.waveAmp = v; redraw(); updateCodeBox(); });
+      } else if (layerId === 'body' || layerId === 'vehicle') {
+        addSlider(container, '오프셋 X', data.x, -100, 100, 1, v => { data.x = v; redraw(); updateCodeBox(); });
+        addSlider(container, '오프셋 Y', data.y, -100, 100, 1, v => { data.y = v; redraw(); updateCodeBox(); });
+        addSlider(container, '스케일 배율', data.scale, 0.7, 1.4, 0.01, v => { data.scale = v; redraw(); updateCodeBox(); });
+      }
+    }
+
+    function addSlider(container, labelText, value, min, max, step, onChange) {
+      const row = document.createElement('div');
+      row.className = 'control-row';
+
+      const label = document.createElement('span');
+      label.className = 'control-label';
+      label.innerText = labelText;
+
+      const inputWrap = document.createElement('div');
+      inputWrap.className = 'control-inputs';
+
+      const slider = document.createElement('input');
+      slider.type = 'range';
+      slider.className = 'slider';
+      slider.min = min;
+      slider.max = max;
+      slider.step = step;
+      slider.value = value;
+
+      const num = document.createElement('input');
+      num.type = 'number';
+      num.className = 'num-input';
+      num.min = min;
+      num.max = max;
+      num.step = step;
+      num.value = typeof value === 'number' && !Number.isInteger(value) ? value.toFixed(2) : value;
+
+      slider.oninput = (e) => {
+        const val = parseFloat(e.target.value);
+        num.value = !Number.isInteger(val) ? val.toFixed(2) : val;
+        onChange(val);
+      };
+      num.onchange = (e) => {
+        const val = parseFloat(e.target.value);
+        slider.value = val;
+        onChange(val);
+      };
+
+      inputWrap.appendChild(slider);
+      inputWrap.appendChild(num);
+      row.appendChild(label);
+      row.appendChild(inputWrap);
+      container.appendChild(row);
+    }
+
+    // =========================================================================
+    //  캔버스 렌더링 파이프라인 (인게임 동일 로직)
+    // =========================================================================
+    const sirenConfig = {
+      fire: { leftX: 0.555, leftY: 0.122, rightX: 0.655, rightY: 0.128, leftColor: '#ff1744', rightColor: '#00e5ff' },
+      ambulance: { leftX: 0.557, leftY: 0.121, rightX: 0.655, rightY: 0.128, leftColor: '#ff1744', rightColor: '#00e5ff' },
+      police: { leftX: 0.554, leftY: 0.125, rightX: 0.653, rightY: 0.129, leftColor: '#ff1744', rightColor: '#00e5ff' },
+    };
+
+    function drawTunerSiren(ctx, type) {
+      const sCfg = sirenConfig[type] || sirenConfig.fire;
+      const cycle = animRunning ? (animTime * 10.0) : 1.5;
+      const isLeftActive = Math.sin(cycle) >= 0;
+      const pulse = 0.72 + 0.28 * Math.abs(Math.sin(cycle * 2));
+
+      const activeX = CANVAS_W * (isLeftActive ? sCfg.leftX : sCfg.rightX);
+      const activeY = CANVAS_H * (isLeftActive ? (sCfg.leftY || 0.122) : (sCfg.rightY || 0.128));
+      const activeColor = isLeftActive ? sCfg.leftColor : sCfg.rightColor;
+
+      const rayAngles = isLeftActive ? [-2.42, -2.02, -1.65] : [-1.48, -1.10, -0.70];
+
+      ctx.save();
+      ctx.translate(activeX, activeY);
+
+      // 글로우 후광
+      const glowR = CANVAS_W * 0.062 * pulse;
+      const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, glowR);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      grad.addColorStop(0.25, activeColor);
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, 0, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 빛줄기 방사
+      ctx.strokeStyle = activeColor;
+      ctx.lineWidth = 3.5;
+      ctx.lineCap = 'round';
+      ctx.globalAlpha = 0.85 * pulse;
+      for (const ang of rayAngles) {
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(ang) * (glowR * 0.28), Math.sin(ang) * (glowR * 0.28));
+        ctx.lineTo(Math.cos(ang) * (glowR * 1.05), Math.sin(ang) * (glowR * 1.05));
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function redraw() {
+      ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+
+      const showGuides = document.getElementById('chkGuides').checked;
+      const tData = tuneData[currentVehicle];
+
+      // 도로 배경 모드일 때 배경 먼저 렌더링
+      if (currentBgMode === 'road' && images.roadBg.complete && images.roadBg.width > 0) {
+        ctx.drawImage(images.roadBg, 0, 120, CANVAS_W, 544);
+      }
+
+      // [Layer 1: 차량 본체 (Vehicle)]
+      if (layerVisibility.vehicle) {
+        const veh = tData.vehicle;
+        const vehImg = images[currentVehicle].vehicle;
+        if (vehImg && vehImg.complete) {
+          ctx.save();
+          ctx.translate(CANVAS_W / 2 + veh.x, CANVAS_H / 2 + veh.y);
+          ctx.scale(veh.scale, veh.scale);
+          ctx.drawImage(vehImg, -CANVAS_W / 2, -CANVAS_H / 2, CANVAS_W, CANVAS_H);
+          ctx.restore();
+        }
+      }
+
+      // [Layer 1.5: 지붕 사이렌 경광등 (차량과 캐릭터 사이 레이어)]
+      drawTunerSiren(ctx, currentVehicle);
+
+      // [Layer 2: 양팔 (Arms)]
+      if (layerVisibility.arm) {
+        const armCfg = tData.arm;
+        const armImg = images[currentVehicle].arm;
+        if (armImg && armImg.complete) {
+          const waveAngle = armCfg.baseAngle + (animRunning ? Math.sin(animTime * 8.5) * armCfg.waveAmp : 0);
+          const faceCX = tData.face.cx;
+
+          // 왼팔
+          ctx.save();
+          ctx.translate(armCfg.pivotX, armCfg.pivotY);
+          ctx.rotate(waveAngle);
+          ctx.scale(armCfg.scale, armCfg.scale);
+          ctx.drawImage(armImg, -armCfg.pivotX, -armCfg.pivotY, CANVAS_W, CANVAS_H);
+          ctx.restore();
+
+          // 오른팔 (대칭)
+          const rightPivotX = faceCX + (faceCX - armCfg.pivotX);
+          const rightPivotY = armCfg.pivotY;
+          ctx.save();
+          ctx.translate(rightPivotX, rightPivotY);
+          ctx.scale(-armCfg.scale, armCfg.scale);
+          ctx.rotate(waveAngle);
+          ctx.drawImage(armImg, -armCfg.pivotX, -armCfg.pivotY, CANVAS_W, CANVAS_H);
+          ctx.restore();
+        }
+      }
+
+      // [Layer 3: 몸통 (Body)]
+      if (layerVisibility.body) {
+        const bodyCfg = tData.body;
+        const bodyImg = images[currentVehicle].body;
+        if (bodyImg && bodyImg.complete) {
+          ctx.save();
+          ctx.translate(CANVAS_W / 2 + bodyCfg.x, CANVAS_H / 2 + bodyCfg.y);
+          ctx.scale(bodyCfg.scale, bodyCfg.scale);
+          ctx.drawImage(bodyImg, -CANVAS_W / 2, -CANVAS_H / 2, CANVAS_W, CANVAS_H);
+          ctx.restore();
+        }
+      }
+
+      // [Layer 4: 얼굴 슬롯 (Face)]
+      if (layerVisibility.face) {
+        const faceCfg = tData.face;
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(faceCfg.cx, faceCfg.cy, faceCfg.rx, faceCfg.ry, 0, 0, Math.PI * 2);
+        ctx.clip();
+
+        if (images.face.complete && images.face.width > 0) {
+          const fSize = Math.max(faceCfg.rx, faceCfg.ry) * faceCfg.scale;
+          ctx.drawImage(
+            images.face, 
+            faceCfg.cx - fSize * 0.5 + faceCfg.offsetX, 
+            faceCfg.cy - fSize * 0.5 + faceCfg.offsetY, 
+            fSize, 
+            fSize
+          );
+        }
+        ctx.restore();
+      }
+
+      // [Layer 5: 헬멧 / 모자 (Helmet)]
+      if (layerVisibility.helmet) {
+        const helmCfg = tData.helmet;
+        let hImg = null;
+
+        if (helmCfg.type === 'custom' && customHelmetImg) {
+          hImg = customHelmetImg;
+        } else if (currentVehicle === 'fire' && helmCfg.type.startsWith('cand_')) {
+          const num = parseInt(helmCfg.type.replace('cand_', ''));
+          hImg = images.helmets.fire_cand[num];
+        } else if (currentVehicle === 'police' && helmCfg.type === 'restored') {
+          hImg = images.helmets.police_restored;
+        } else if (currentVehicle === 'ambulance' && helmCfg.type === 'restored') {
+          hImg = images.helmets.ambulance_restored;
+        } else {
+          hImg = images[currentVehicle].helmetOriginal;
+        }
+
+        if (hImg && hImg.complete && hImg.width > 0) {
+          ctx.save();
+          ctx.translate(helmCfg.cx, helmCfg.cy);
+          if (helmCfg.rotation !== 0) {
+            ctx.rotate((helmCfg.rotation * Math.PI) / 180);
+          }
+
+          // 960x664 원본 헬멧 vs 크롭형 독립 소품 헬멧 구분
+          if (helmCfg.type === 'original' && hImg.width === CANVAS_W) {
+            // 풀 캔버스 원본 모드: cx=440, cy=112 기준으로 평행이동
+            ctx.drawImage(hImg, -440, -112, CANVAS_W, CANVAS_H);
+          } else {
+            // 독립 크롭 소품 모드: 중심 기준 배치
+            ctx.drawImage(hImg, -helmCfg.width / 2, -helmCfg.height / 2, helmCfg.width, helmCfg.height);
+          }
+          ctx.restore();
+        }
+      }
+
+      // [보조선 및 기즈모 (Guides & Gizmos)]
+      if (showGuides) {
+        drawGuidesAndGizmos(ctx, tData);
+      }
+
+      // 미니 프리뷰 렌더링
+      drawMiniPreview();
+    }
+
+    // 가이드선 및 기즈모 그리기
+    function drawGuidesAndGizmos(gCtx, tData) {
+      gCtx.save();
+
+      // 1. 얼굴 슬롯 타원 가이드 (녹색 점선)
+      const face = tData.face;
+      gCtx.strokeStyle = 'rgba(46, 213, 115, 0.8)';
+      gCtx.lineWidth = 1.5;
+      gCtx.setLineDash([4, 4]);
+      gCtx.beginPath();
+      gCtx.ellipse(face.cx, face.cy, face.rx, face.ry, 0, 0, Math.PI * 2);
+      gCtx.stroke();
+      gCtx.setLineDash([]);
+
+      // 2. 어깨 피벗 포인트 (오렌지색 십자선)
+      const arm = tData.arm;
+      drawPivotCross(gCtx, arm.pivotX, arm.pivotY, 'rgba(255, 165, 2, 0.9)', '왼팔 피벗');
+      const rightX = face.cx + (face.cx - arm.pivotX);
+      drawPivotCross(gCtx, rightX, arm.pivotY, 'rgba(255, 165, 2, 0.9)', '오른팔 피벗');
+
+      // 3. 선택된 레이어의 바운딩 박스 기즈모
+      if (selectedLayerId === 'helmet') {
+        const h = tData.helmet;
+        gCtx.save();
+        gCtx.translate(h.cx, h.cy);
+        gCtx.rotate((h.rotation * Math.PI) / 180);
+        gCtx.strokeStyle = 'rgba(30, 144, 255, 0.9)';
+        gCtx.lineWidth = 2;
+        gCtx.strokeRect(-h.width / 2, -h.height / 2, h.width, h.height);
+
+        // 중심점
+        gCtx.fillStyle = '#ff4757';
+        gCtx.beginPath();
+        gCtx.arc(0, 0, 4, 0, Math.PI * 2);
+        gCtx.fill();
+
+        // 상단 회전 핸들
+        gCtx.beginPath();
+        gCtx.moveTo(0, -h.height / 2);
+        gCtx.lineTo(0, -h.height / 2 - 20);
+        gCtx.stroke();
+        gCtx.fillStyle = '#2ed573';
+        gCtx.beginPath();
+        gCtx.arc(0, -h.height / 2 - 20, 5, 0, Math.PI * 2);
+        gCtx.fill();
+
+        gCtx.restore();
+      } else if (selectedLayerId === 'face') {
+        gCtx.fillStyle = '#2ed573';
+        gCtx.beginPath();
+        gCtx.arc(face.cx, face.cy, 5, 0, Math.PI * 2);
+        gCtx.fill();
+      }
+
+      gCtx.restore();
+    }
+
+    function drawPivotCross(gCtx, x, y, color, label) {
+      gCtx.strokeStyle = color;
+      gCtx.lineWidth = 2;
+      gCtx.beginPath();
+      gCtx.moveTo(x - 8, y);
+      gCtx.lineTo(x + 8, y);
+      gCtx.moveTo(x, y - 8);
+      gCtx.lineTo(x, y + 8);
+      gCtx.stroke();
+
+      gCtx.fillStyle = color;
+      gCtx.font = '10px monospace';
+      gCtx.fillText(`${label} (${Math.round(x)}, ${Math.round(y)})`, x + 10, y - 4);
+    }
+
+    // 미니 프리뷰 (300x208 인게임 크기)
+    function drawMiniPreview() {
+      miniCtx.clearRect(0, 0, 300, 208);
+      miniCtx.save();
+      miniCtx.scale(300 / CANVAS_W, 208 / CANVAS_H);
+      miniCtx.drawImage(canvas, 0, 0);
+      miniCtx.restore();
+    }
+
+    // =========================================================================
+    //  마우스 인터랙션 (드래그로 위치 직접 이동)
+    // =========================================================================
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let initialObjX = 0;
+    let initialObjY = 0;
+
+    function setupCanvasInteractions() {
+      const container = document.getElementById('canvasContainer');
+
+      canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = (e.clientX - rect.left) / zoomLevel;
+        const mouseY = (e.clientY - rect.top) / zoomLevel;
+
+        isDragging = true;
+        dragStartX = mouseX;
+        dragStartY = mouseY;
+
+        const data = tuneData[currentVehicle];
+        if (selectedLayerId === 'helmet') {
+          initialObjX = data.helmet.cx;
+          initialObjY = data.helmet.cy;
+        } else if (selectedLayerId === 'face') {
+          initialObjX = data.face.cx;
+          initialObjY = data.face.cy;
+        } else if (selectedLayerId === 'arm') {
+          initialObjX = data.arm.pivotX;
+          initialObjY = data.arm.pivotY;
+        } else if (selectedLayerId === 'body') {
+          initialObjX = data.body.x;
+          initialObjY = data.body.y;
+        } else if (selectedLayerId === 'vehicle') {
+          initialObjX = data.vehicle.x;
+          initialObjY = data.vehicle.y;
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = (e.clientX - rect.left) / zoomLevel;
+        const mouseY = (e.clientY - rect.top) / zoomLevel;
+
+        const dx = mouseX - dragStartX;
+        const dy = mouseY - dragStartY;
+
+        const data = tuneData[currentVehicle];
+        if (selectedLayerId === 'helmet') {
+          data.helmet.cx = Math.round(initialObjX + dx);
+          data.helmet.cy = Math.round(initialObjY + dy);
+        } else if (selectedLayerId === 'face') {
+          data.face.cx = Math.round((initialObjX + dx) * 10) / 10;
+          data.face.cy = Math.round((initialObjY + dy) * 10) / 10;
+        } else if (selectedLayerId === 'arm') {
+          data.arm.pivotX = Math.round(initialObjX + dx);
+          data.arm.pivotY = Math.round(initialObjY + dy);
+        } else if (selectedLayerId === 'body') {
+          data.body.x = Math.round(initialObjX + dx);
+          data.body.y = Math.round(initialObjY + dy);
+        } else if (selectedLayerId === 'vehicle') {
+          data.vehicle.x = Math.round(initialObjX + dx);
+          data.vehicle.y = Math.round(initialObjY + dy);
+        }
+
+        buildInspectorControls(selectedLayerId);
+        redraw();
+        updateCodeBox();
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+        }
+      });
+
+      // 키보드 미세조정 (방향키: 1px, Shift+방향키: 10px)
+      window.addEventListener('keydown', (e) => {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+          // input 포커스 중일 땐 기본 동작 유지
+          if (document.activeElement.tagName === 'INPUT') return;
+          e.preventDefault();
+
+          const step = e.shiftKey ? 10 : 1;
+          const data = tuneData[currentVehicle];
+
+          let deltaX = 0;
+          let deltaY = 0;
+          if (e.key === 'ArrowLeft') deltaX = -step;
+          if (e.key === 'ArrowRight') deltaX = step;
+          if (e.key === 'ArrowUp') deltaY = -step;
+          if (e.key === 'ArrowDown') deltaY = step;
+
+          if (selectedLayerId === 'helmet') {
+            data.helmet.cx += deltaX;
+            data.helmet.cy += deltaY;
+          } else if (selectedLayerId === 'face') {
+            data.face.cx += deltaX;
+            data.face.cy += deltaY;
+          } else if (selectedLayerId === 'arm') {
+            data.arm.pivotX += deltaX;
+            data.arm.pivotY += deltaY;
+          } else if (selectedLayerId === 'body') {
+            data.body.x += deltaX;
+            data.body.y += deltaY;
+          } else if (selectedLayerId === 'vehicle') {
+            data.vehicle.x += deltaX;
+            data.vehicle.y += deltaY;
+          }
+
+          buildInspectorControls(selectedLayerId);
+          redraw();
+          updateCodeBox();
+        }
+      });
+    }
+
+    // =========================================================================
+    //  배경 모드 및 줌 설정
+    // =========================================================================
+    let currentBgMode = 'checker';
+
+    function setBg(mode) {
+      currentBgMode = mode;
+      const container = document.getElementById('canvasContainer');
+      container.className = 'canvas-container';
+      if (mode === 'checker') container.classList.add('bg-checker');
+      if (mode === 'road') container.classList.add('bg-road');
+      if (mode === 'dark') container.style.background = '#0e0f14';
+      redraw();
+    }
+
+    function setZoom(level) {
+      zoomLevel = level;
+      canvas.style.transform = `scale(${level})`;
+      document.getElementById('zoomText').innerText = `${Math.round(level * 100)}%`;
+    }
+
+    // 애니메이션 토글
+    function toggleAnim(enable) {
+      animRunning = enable;
+      if (enable) {
+        let lastTime = performance.now();
+        function loop(now) {
+          const dt = (now - lastTime) / 1000;
+          lastTime = now;
+          animTime += dt;
+          redraw();
+          if (animRunning) {
+            animRafId = requestAnimationFrame(loop);
+          }
+        }
+        animRafId = requestAnimationFrame(loop);
+      } else {
+        if (animRafId) cancelAnimationFrame(animRafId);
+        animTime = 0;
+        redraw();
+      }
+    }
+
+    // =========================================================================
+    //  코드 생성 및 내보내기
+    // =========================================================================
+    function updateCodeBox() {
+      const d = tuneData[currentVehicle];
+      const cxRatio = (d.face.cx / CANVAS_W).toFixed(4);
+      const cyRatio = (d.face.cy / CANVAS_H).toFixed(4);
+      const rxRatio = (d.face.rx / CANVAS_W).toFixed(4);
+      const ryRatio = (d.face.ry / CANVAS_H).toFixed(4);
+
+      const pxRatio = (d.arm.pivotX / CANVAS_W).toFixed(4);
+      const pyRatio = (d.arm.pivotY / CANVAS_H).toFixed(4);
+
+      const code = `// =========================================================================
+// [${currentVehicle.toUpperCase()}] 조율된 인게임 설정 (src/config.js 반영용)
+// =========================================================================
+faceSlot: {
+  cxRatio: ${cxRatio}, // ${d.face.cx} / 960 (얼굴 중심 X)
+  cyRatio: ${cyRatio}, // ${d.face.cy} / 664 (얼굴 중심 Y)
+  rxRatio: ${rxRatio}, // ${d.face.rx} / 960 (가로 반경)
+  ryRatio: ${ryRatio}, // ${d.face.ry} / 664 (세로 반경)
+},
+armPivot: {
+  pxRatio: ${pxRatio}, // ${d.arm.pivotX} / 960 (어깨 피벗 X)
+  pyRatio: ${pyRatio}, // ${d.arm.pivotY} / 664 (어깨 피벗 Y)
+},
+helmetSlot: {
+  type: '${d.helmet.type}',
+  cx: ${d.helmet.cx},
+  cy: ${d.helmet.cy},
+  width: ${d.helmet.width},
+  height: ${d.helmet.height},
+  rotation: ${d.helmet.rotation},
+}`;
+
+      document.getElementById('codeBox').innerText = code;
+    }
+
+    function copyConfigCode() {
+      const code = document.getElementById('codeBox').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('📋 config.js 코드가 클립보드에 복사되었습니다!');
+      }).catch(() => {
+        showToast('⚠️ 복사 실패: 수동으로 복사해주세요.');
+      });
+    }
+
+    // 선택한 헬멧을 960x664 풀 캔버스 규격 PNG로 렌더링하여 다운로드!
+    // -> 게임의 assets/player/helmet_{type}.png에 그대로 덮어쓸 수 있는 규격
+    function exportHelmet960() {
+      const expCanvas = document.createElement('canvas');
+      expCanvas.width = CANVAS_W;
+      expCanvas.height = CANVAS_H;
+      const expCtx = expCanvas.getContext('2d');
+
+      const helmCfg = tuneData[currentVehicle].helmet;
+      let hImg = null;
+
+      if (helmCfg.type === 'custom' && customHelmetImg) {
+        hImg = customHelmetImg;
+      } else if (currentVehicle === 'fire' && helmCfg.type.startsWith('cand_')) {
+        const num = parseInt(helmCfg.type.replace('cand_', ''));
+        hImg = images.helmets.fire_cand[num];
+      } else if (currentVehicle === 'police' && helmCfg.type === 'restored') {
+        hImg = images.helmets.police_restored;
+      } else if (currentVehicle === 'ambulance' && helmCfg.type === 'restored') {
+        hImg = images.helmets.ambulance_restored;
+      } else {
+        hImg = images[currentVehicle].helmetOriginal;
+      }
+
+      if (!hImg || !hImg.complete) {
+        alert('헬멧 이미지가 아직 로드되지 않았습니다.');
+        return;
+      }
+
+      expCtx.save();
+      expCtx.translate(helmCfg.cx, helmCfg.cy);
+      if (helmCfg.rotation !== 0) {
+        expCtx.rotate((helmCfg.rotation * Math.PI) / 180);
+      }
+      expCtx.drawImage(hImg, -helmCfg.width / 2, -helmCfg.height / 2, helmCfg.width, helmCfg.height);
+      expCtx.restore();
+
+      const link = document.createElement('a');
+      link.download = `helmet_${currentVehicle}.png`;
+      link.href = expCanvas.toDataURL('image/png');
+      link.click();
+
+      showToast(`💾 960x664 규격 'helmet_${currentVehicle}.png' 다운로드 완료!`);
+    }
+
+    // 전체 합성본 960x664 저장
+    function exportCompositePNG() {
+      // 보조선 제외하고 순수 렌더링하기 위해 잠시 체크 해제 후 렌더
+      const chk = document.getElementById('chkGuides');
+      const prev = chk.checked;
+      chk.checked = false;
+      redraw();
+
+      const link = document.createElement('a');
+      link.download = `composite_${currentVehicle}_assembled.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+
+      chk.checked = prev;
+      redraw();
+      showToast(`🖼️ 캐릭터 합성본 PNG 다운로드 완료!`);
+    }
+
+    // 프리셋 JSON 저장/로드
+    function downloadPresetJSON() {
+      const blob = new Blob([JSON.stringify(tuneData, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.download = `ryan_rush_asset_tuning_presets.json`;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      showToast('💾 프리셋 JSON 저장 완료!');
+    }
+
+    function loadPresetJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const loaded = JSON.parse(evt.target.result);
+          tuneData = loaded;
+          buildHelmetGallery();
+          buildInspectorControls(selectedLayerId);
+          redraw();
+          updateCodeBox();
+          showToast('📂 프리셋 JSON 불러오기 성공!');
+        } catch (err) {
+          alert('JSON 파일 형식이 올바르지 않습니다.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // =========================================================================
+    //  다른 차량 설정값 복사 기능
+    // =========================================================================
+    function copySettingsFromVehicle() {
+      const source = document.getElementById('selCopySource').value;
+      if (source === currentVehicle) {
+        showToast(`⚠️ 현재 작업 중인 차량과 동일한 차량입니다.`);
+        return;
+      }
+
+      const copyFace = document.getElementById('chkCopyFace').checked;
+      const copyArm = document.getElementById('chkCopyArm').checked;
+      const copyHelmet = document.getElementById('chkCopyHelmet').checked;
+
+      if (!copyFace && !copyArm && !copyHelmet) {
+        alert('복사할 파츠를 하나 이상 체크해주세요.');
+        return;
+      }
+
+      const srcData = tuneData[source];
+      const targetData = tuneData[currentVehicle];
+
+      if (copyFace) {
+        targetData.face = JSON.parse(JSON.stringify(srcData.face));
+      }
+      if (copyArm) {
+        targetData.arm = JSON.parse(JSON.stringify(srcData.arm));
+      }
+      if (copyHelmet) {
+        // 헬멧의 좌표와 크기만 복사하고, 현재 차량 고유의 헬멧 타입은 유지
+        targetData.helmet.cx = srcData.helmet.cx;
+        targetData.helmet.cy = srcData.helmet.cy;
+        targetData.helmet.width = srcData.helmet.width;
+        targetData.helmet.height = srcData.helmet.height;
+        targetData.helmet.rotation = srcData.helmet.rotation;
+      }
+
+      buildInspectorControls(selectedLayerId);
+      redraw();
+      updateCodeBox();
+
+      const nameMap = { fire: '소방차', ambulance: '구급차', police: '경찰차' };
+      showToast(`📋 ${nameMap[source]} 설정을 ${nameMap[currentVehicle]}에 복사했습니다!`);
+    }
+
+    function quickCopyFromFire() {
+      if (currentVehicle === 'fire') {
+        showToast('ℹ️ 이미 소방차 편집 모드입니다.');
+        return;
+      }
+
+      const srcData = tuneData.fire;
+      const targetData = tuneData[currentVehicle];
+
+      targetData.face = JSON.parse(JSON.stringify(srcData.face));
+      targetData.arm = JSON.parse(JSON.stringify(srcData.arm));
+      targetData.helmet.cx = srcData.helmet.cx;
+      targetData.helmet.cy = srcData.helmet.cy;
+      targetData.helmet.width = srcData.helmet.width;
+      targetData.helmet.height = srcData.helmet.height;
+      targetData.helmet.rotation = srcData.helmet.rotation;
+
+      buildInspectorControls(selectedLayerId);
+      redraw();
+      updateCodeBox();
+
+      const nameMap = { ambulance: '구급차', police: '경찰차' };
+      showToast(`⚡ 소방차의 조율된 설정을 ${nameMap[currentVehicle]}에 원클릭 적용했습니다!`);
+    }
+
+    function resetCurrentVehicle() {
+      if (confirm(`'${currentVehicle.toUpperCase()}' 설정을 초기값으로 리셋하시겠습니까?`)) {
+        tuneData[currentVehicle] = JSON.parse(JSON.stringify(defaultData[currentVehicle]));
+        buildHelmetGallery();
+        buildInspectorControls(selectedLayerId);
+        redraw();
+        updateCodeBox();
+        showToast('🔄 현재 직종 기본값으로 리셋되었습니다.');
+      }
+    }
+
+    function resetCurrentLayer() {
+      const def = defaultData[currentVehicle][selectedLayerId];
+      tuneData[currentVehicle][selectedLayerId] = JSON.parse(JSON.stringify(def));
+      buildInspectorControls(selectedLayerId);
+      redraw();
+      updateCodeBox();
+      showToast(`🔄 ${selectedLayerId.toUpperCase()} 레이어 리셋 완료`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
