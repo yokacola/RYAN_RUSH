@@ -13,6 +13,14 @@ export const GAME_CONFIG = {
       name: '리안',
       photo: 'assets/player/default_face.png',
     },
+    dawon: {
+      name: '다원',
+      photo: 'assets/player/dawon_face.png',
+    },
+    DAWON: {
+      name: '다원',
+      photo: 'assets/player/dawon_face.png',
+    },
   },
 
   // -----------------------------------------------------------------------

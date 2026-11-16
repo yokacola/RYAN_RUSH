@@ -621,9 +621,9 @@ export class Player {
     ctx.clip();
 
     if (faceImg && faceImg.complete && faceImg.width > 0) {
-      const isCustom = (this.customFaceImg && this.customFaceImg.complete && this.customFaceImg.width > 0 && faceImg === this.customFaceImg);
-      if (isCustom) {
-        // [사용자 커스텀 등록 사진] 모달 크롭 창에서 노란 점선 타원에 맞춘 비율(2.08)과 타원 중심(faceCX, faceCY)에 1:1 정밀 일치!
+      const isDefault = (faceImg === this.defaultFaceImg) || (faceImg.src && faceImg.src.includes('default_face.png'));
+      if (!isDefault) {
+        // [사용자 커스텀 등록 사진 / DAWON 프리셋] 모달 크롭 창에서 노란 점선 타원에 맞춘 비율(2.08)과 타원 중심(faceCX, faceCY)에 1:1 정밀 일치!
         const fSize = Math.max(faceRX, faceRY) * 2.08;
         ctx.drawImage(faceImg, faceCX - fSize * 0.5, faceCY - fSize * 0.5, fSize, fSize);
       } else {
