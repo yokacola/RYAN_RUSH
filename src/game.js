@@ -1,10 +1,10 @@
-import { GAME_CONFIG } from './config.js?v=25';
-import { AudioManager } from './audio.js?v=8';
-import { Player } from './player.js?v=25';
-import { Background } from './background.js?v=17';
-import { Spawner } from './spawner.js?v=8';
-import { UIManager } from './ui.js?v=9';
-import { ProfileManager } from './profile.js?v=25';
+import { GAME_CONFIG } from './config.js?v=26';
+import { AudioManager } from './audio.js?v=26';
+import { Player } from './player.js?v=26';
+import { Background } from './background.js?v=26';
+import { Spawner } from './spawner.js?v=26';
+import { UIManager } from './ui.js?v=26';
+import { ProfileManager } from './profile.js?v=26';
 import { drawRoundedStar } from './utils.js?v=8';
 
 export class Game {

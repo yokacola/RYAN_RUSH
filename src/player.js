@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js?v=23';
+import { GAME_CONFIG } from './config.js?v=26';
 import { drawRoundedStar } from './utils.js?v=12';
 
 // 소방차 / 구급차 / 경찰차 + 흔드는 팔 + 아이 얼굴 + 턱끈 없는 헬멧 + 정밀 사이렌 반짝임 + 1단점프 하단 스프링 + 2단점프 앞/뒤 바퀴축 로켓불꽃 & 연기

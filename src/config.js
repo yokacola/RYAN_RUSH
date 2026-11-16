@@ -11,15 +11,15 @@ export const GAME_CONFIG = {
   presets: {
     ryan: {
       name: '리안',
-      photo: 'assets/player/default_face.png',
+      photo: 'assets/player/default_face.png?v=26',
     },
     dawon: {
       name: '다원',
-      photo: 'assets/player/dawon_face.png',
+      photo: 'assets/player/dawon_face.png?v=26',
     },
     DAWON: {
       name: '다원',
-      photo: 'assets/player/dawon_face.png',
+      photo: 'assets/player/dawon_face.png?v=26',
     },
   },
 

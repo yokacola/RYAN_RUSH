@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js?v=23';
+import { GAME_CONFIG } from './config.js?v=26';
 
 // =========================================================================
 //  아이 사진 크롭(AI 자동 얼굴 감지 + 헬멧 가이드 + 크기/각도/폭 조절), 로컬 캐시 및 특정 URL 프리셋 매니저
@@ -78,12 +78,20 @@ export class ProfileManager {
 
       const presets = (GAME_CONFIG && GAME_CONFIG.presets) || {};
 
-      if (presetKey && presets[presetKey]) {
-        const p = presets[presetKey];
-        return {
-          name: (nameParam || p.name || '리안').trim(),
-          photo: photoParam || p.photo || 'assets/player/default_face.png?v=10',
+      if (presetKey) {
+        const lowerKey = presetKey.toLowerCase();
+        // 캐시 지연 대비 직접 폴백 매핑 지원 (dawon, ryan)
+        const fallbackMap = {
+          dawon: { name: '다원', photo: 'assets/player/dawon_face.png?v=26' },
+          ryan: { name: '리안', photo: 'assets/player/default_face.png?v=26' },
         };
+        const p = presets[presetKey] || presets[lowerKey] || fallbackMap[lowerKey];
+        if (p) {
+          return {
+            name: (nameParam || p.name || '다원').trim(),
+            photo: photoParam || p.photo || 'assets/player/dawon_face.png?v=26',
+          };
+        }
       }
 
       if (nameParam || photoParam || lockParam !== null) {

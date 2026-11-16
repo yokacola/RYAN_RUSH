@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js?v=8';
+import { GAME_CONFIG } from './config.js?v=26';
 import { drawRoundedStar } from './utils.js?v=8';
 
 const UI_FONT = '"IBM Plex Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';

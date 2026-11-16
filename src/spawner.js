@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js?v=6';
+import { GAME_CONFIG } from './config.js?v=26';
 
 // 사물 (아이템 및 장애물) 스폰 및 충돌 판정 매니저
 export class Spawner {

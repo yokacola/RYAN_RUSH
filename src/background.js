@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js?v=13';
+import { GAME_CONFIG } from './config.js?v=26';
 
 // 사용자 제작 4장 배경 레이어 연동 시스템
 // Layer 1: bg_city.png (하늘 배경)

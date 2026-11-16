@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from './config.js';
+import { GAME_CONFIG } from './config.js?v=26';
 
 // Web Audio API 기반 효과음 및 BGM 오디오 매니저
 export class AudioManager {
